@@ -13,10 +13,11 @@ curl -fLO https://raw.githubusercontent.com/bohanyang/debi/master/debi.sh && chm
 ```
 sudo ./debi.sh --cdn --network-console --ethx --bbr --user root --password <这里设置 root 密码>
 ```
-
+* ❗ **Oracle ARM 架构还需要添加 `--bpo-kernel` 参数，以安装新版 5.10 内核，否则系统可能无法启动**
 * 以上命令选项开启了 BBR；设置了网卡名称形式是 `eth0` 而不是 `ens3` 这种。
-* 如果是一般的 x86 架构 64 位机器（不是 ARM 架构的），还可以添加 `--cloud-kernel` 使用轻量版内核。
 * 不加 `--password` 选项会提示输入密码。
+* （可选）添加 `--cloud-kernel` 参数，以安装空间占用较小的内核，但可能会导致 UEFI 启动的机器（如 Oracle、Azure 及 Hyper-V、Google Cloud 等）VNC 黑屏。BIOS 启动的普通 VPS 则没有此问题。
+* 默认使用 UTC 时区，中国时区请加 `--timezone Asia/Shanghai`
 
 如果没有报错可以重启：
 
@@ -98,7 +99,9 @@ Otherwise, you can run this command to revert all changes made by the script:
  * `--dns '8.8.8.8 8.8.4.4'` (Default IPv6 DNS: `2001:4860:4860::8888 2001:4860:4860::8844`)
  * `--hostname <string>` FQDN hostname (includes the domain name), e.g. `server1.example.com`
  * `--network-console` Enable the network console of the installer. `ssh installer@ip` to connect
- * `--suite buster`
+ * `--suite buster` Choose the version to install: `buster` or `stable` for 10, `bullseye` or `testing` for 11, `stretch` or `oldstable` for 9, `sid` or `unstable`
+ * `--release-d-i` d-i (Debian Installer) for the released versions: 10 (buster) and 9 (stretch)
+ * `--daily-d-i` Use latest daily build of d-i (Debian Installer) for the unreleased versions: 11 (bullseye) and sid (unstable)
  * `--mirror-protocol http` or `https` or `ftp`
  * `--https` alias to `--mirror-protocol https`
  * `--mirror-host deb.debian.org`
@@ -109,7 +112,7 @@ Otherwise, you can run this command to revert all changes made by the script:
  * `--password <string>` Password of the new user. **You'll be prompted if you choose to not specify it here**
  * `--authorized-keys-url <string>` URL to your authorized keys for SSH authentication. e.g. `https://github.com/torvalds.keys`
  * `--sudo-with-password` Require password when the user invokes `sudo` command
- * `--timezone UTC` https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List
+ * `--timezone UTC` e.g. `Asia/Shanghai` for China (UTC+8) https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List
  * `--ntp 0.debian.pool.ntp.org`
  * `--no-disk-partitioning, --no-part` **(Manual installation)** Proceed disk partitioning manually in VNC or remote console
  * `--disk <string>` Manually select a disk for installation. **Please remember to specify this when more than one disk is available!** e.g. `/dev/sda`
@@ -118,7 +121,8 @@ Otherwise, you can run this command to revert all changes made by the script:
  * `--efi` Create an *EFI system partition*. Default if `/sys/firmware/efi` exists
  * `--filesystem ext4`
  * `--kernel <string>` Choose an package for the kernel image
- * `--cloud-kernel` Choose `linux-image-cloud-amd64` as the kernel image
+ * `--cloud-kernel` Choose `linux-image-cloud-amd64` or `...arm64` as the kernel image
+ * `--bpo-kernel` Choose the kernel image from Debian Backports (newer version from the next Debian release)
  * `--no-install-recommends`
  * `--install 'ca-certificates libpam-systemd'`
  * `--safe-upgrade` **(Default)** `apt upgrade --with-new-pkgs`. [See](https://salsa.debian.org/installer-team/pkgsel/-/blob/master/debian/postinst)
